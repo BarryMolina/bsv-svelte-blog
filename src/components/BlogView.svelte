@@ -16,6 +16,10 @@
 </div>
 
 <style>
+	* {
+		margin: 0;
+		padding: 0;
+	}
 	ul {
 		/* max-width: 500px; */
 		list-style-type: none;
