@@ -5,19 +5,20 @@
 	let posts = []
 	let page = 'home'
 	const token = process.env.token
+
 	const query = {
   "q": {
     "find": {
         "in.e.a": "1BvyP8VZLKEQYKus7oLL1s3r9MQRLXz5pb",
         "out.tape.cell": {
             "$elemMatch": {
-                "s": "Gendale",
+                "s": "1BvyP8VZLKEQYKus7oLL1s3r9MQRLXz5pb",
                 "i": 0
             }
         }
      },
     "project": {
-        "out.tape.cell.s.$": 1
+        "out.tape.cell.$": 1
     },
     "limit": 5
   }
@@ -32,14 +33,31 @@ fetch('https://bob.bitbus.network/block', {
 	body: JSON.stringify(query)
 })
 	// Retrieve the body as a ReadableStream
-	.then(async res => {
+	.then(res => {
 		const reader = res.body.getReader()
 		return reader.read()
 	})
 	.then( ({ value }) => {
 		const str = new TextDecoder().decode(value);
 		const txArray = JSON.parse(str)
-		posts = txArray.map(tx => tx.out[0].tape[1].cell[1].s)
+		// console.log(txArray)
+		return Promise.all(txArray.map(tx => {
+			const cell = tx.out[0].tape[1].cell[1]
+			if (cell.f) {
+				return fetch('https://x.bitfs.network/' + cell.f)
+					.then(res => {
+						const reader = res.body.getReader()
+						return reader.read()
+					})
+					.then(({value}) => {
+						return JSON.parse(new TextDecoder().decode(value))
+					})
+			}
+			return Promise.resolve(cell.s)
+		}))
+	})
+	.then(res => {
+		console.log(res)
 	})
 </script>
 
@@ -47,14 +65,21 @@ fetch('https://bob.bitbus.network/block', {
 	<header>
 		<ul class="breadcrumbs">
 			<li on:click={() => page = 'home'}>home</li>
-			<li>{page}</li>
+			{#if page != 'home'}
+				<li>&gt;</li>
+				<li>{posts[page]}</li>
+			{/if}
 		</ul>
 
-		<h1>My Svelte App</h1>
+		<h1>My Awesome Svelte App</h1>
 	</header>
 
 	<main>
-		<BlogView posts={posts} bind:page={page}/>
+		{#if page == 'home'}
+			<BlogView posts={posts} bind:page={page}/>
+		{:else}
+			<PostView post={posts[page]}/>
+		{/if}
 	</main>
 
 	<footer></footer>
@@ -73,12 +98,13 @@ fetch('https://bob.bitbus.network/block', {
 		padding: 1rem 0;
 	}
 	h1 {
-			color: white;
+		font-weight: 400;
+		/* font-size: 3rem; */
+		padding: 2rem 0;
 	}
 	.breadcrumbs {
 		display: flex;
 		padding: 1rem 0;
-		color: white;
 		list-style-type: none;
 	}
 	.breadcrumbs li:not(:first-child) {

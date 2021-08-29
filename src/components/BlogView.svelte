@@ -17,9 +17,12 @@
 
 <style>
 	ul {
-		max-width: 500px;
-		color: white;
+		/* max-width: 500px; */
 		list-style-type: none;
+	}
+	li {
+		padding: 1rem;
+
 	}
 	li:hover {
 		cursor: pointer;
