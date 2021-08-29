@@ -2,7 +2,7 @@
 	export let post
 </script>
 
-<p>{@html post}</p>
+<p>{@html post.content}</p>
 
 <style>
 

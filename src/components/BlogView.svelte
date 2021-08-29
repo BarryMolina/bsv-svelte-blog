@@ -10,7 +10,7 @@
 				page = i
 				console.log(page)
 			}
-			}>{@html post}</li>
+			}>{@html post.title}</li>
 		{/each}
 	</ul>
 </div>

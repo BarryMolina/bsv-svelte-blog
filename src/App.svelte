@@ -50,14 +50,19 @@ fetch('https://bob.bitbus.network/block', {
 						return reader.read()
 					})
 					.then(({value}) => {
-						return JSON.parse(new TextDecoder().decode(value))
+						return new TextDecoder().decode(value)
+						// return JSON.parse(new TextDecoder().decode(value))
 					})
 			}
 			return Promise.resolve(cell.s)
 		}))
 	})
-	.then(res => {
-		console.log(res)
+	.then(jsonArr => { 
+		posts = jsonArr.map(json => {
+			const parsed = JSON.parse(json)
+			return parsed
+		})
+		console.log(posts)
 	})
 </script>
 
@@ -67,7 +72,7 @@ fetch('https://bob.bitbus.network/block', {
 			<li on:click={() => page = 'home'}>home</li>
 			{#if page != 'home'}
 				<li>&gt;</li>
-				<li>{posts[page]}</li>
+				<li>{posts[page].title}</li>
 			{/if}
 		</ul>
 
